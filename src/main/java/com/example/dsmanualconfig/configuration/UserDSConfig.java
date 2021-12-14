@@ -19,22 +19,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-@EnableJpaRepositories(entityManagerFactoryRef = "productEntityManagerFactory", basePackages = {"com.example.dsmanualconfig.repository.product"})
+@EnableJpaRepositories(entityManagerFactoryRef = "userEntityManagerFactory",
+        basePackages = {"com.example.dsmanualconfig.repository.user"}, transactionManagerRef = "userTransactionManager")
 @EnableTransactionManagement
 @Configuration
-public class DSConfig {
-    @Value("${spring.datasource.driver-class-name}")
+public class UserDSConfig {
+    @Value("${spring.h2.datasource.driver-class-name}")
     private String driverClass;
-    @Value("${spring.product.datasource.url}")
+    @Value("${spring.h2.datasource.url}")
     private String url;
-    @Value("${spring.datasource.username}")
+    @Value("${spring.h2.username}")
     private String username;
-    @Value("${spring.datasource.password}")
+    @Value("${spring.h2.password}")
     private String password;
 
-    @Primary
-    @Bean("productDS")
-    public DataSource getDatasourceProduct() {
+    @Bean("userDS")
+    public DataSource getDatasourceUser() {
 
         return DataSourceBuilder.create()
                 .driverClassName(driverClass)
@@ -44,25 +44,23 @@ public class DSConfig {
                 .build();
     }
 
-    @Primary
-    @Bean("productEntityManagerFactory")
+    @Bean("userEntityManagerFactory")
     public LocalContainerEntityManagerFactoryBean entityManagerFactoryBeanProduct(EntityManagerFactoryBuilder builder,
-                                                                                  @Qualifier("productDS") DataSource ds) {
+                                                                                  @Qualifier("userDS") DataSource ds) {
         Map<String, Object> properties = new HashMap<>();
         properties.put("hibernate.hbm2ddl.auto", "create-drop");
-        properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
-        LocalContainerEntityManagerFactoryBean entityManager = builder
+        properties.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        return builder
                 .dataSource(ds)
                 .properties(properties)
-                .packages("com.example.dsmanualconfig.model.product")
-                .persistenceUnit("PRODUCT")
+                .packages("com.example.dsmanualconfig.model.user")
+                .persistenceUnit("USER")
                 .build();
-        return entityManager;
     }
 
     @Primary
-    @Bean("transactionManager")
-    public PlatformTransactionManager transactionManager(@Qualifier("productEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
+    @Bean("userTransactionManager")
+    public PlatformTransactionManager transactionManager(@Qualifier("userEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
     }
 }
