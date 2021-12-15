@@ -1,7 +1,7 @@
 package com.example.dsmanualconfig.configuration;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
@@ -20,11 +20,12 @@ import java.util.Map;
 
 
 @EnableJpaRepositories(entityManagerFactoryRef = "productEntityManagerFactory",
-        basePackages = {"com.example.dsmanualconfig.repository.product"}, transactionManagerRef = "productTransactionManager")
+        basePackages = {"com.example.dsmanualconfig.repository.product"},
+        transactionManagerRef = "productTransactionManager")
 @EnableTransactionManagement
 @Configuration
 public class ProductDSConfig {
-    @Value("${spring.datasource.driver-class-name}")
+    /*@Value("${spring.datasource.driver-class-name}")
     private String driverClass;
     @Value("${spring.product.datasource.url}")
     private String url;
@@ -35,14 +36,23 @@ public class ProductDSConfig {
 
     @Primary
     @Bean("productDS")
+    @ConfigurationProperties(prefix = "spring.mysql.datasource")
     public DataSource getDatasourceProduct() {
 
         return DataSourceBuilder.create()
-                .driverClassName(driverClass)
-                .url(url)
-                .username(username)
-                .password(password)
+                //.driverClassName(driverClass)
+                //.url(url)
+                //.username(username)
+                // .password(password)
                 .build();
+    }*/
+
+    @Primary
+    @Bean("productDS")
+    @ConfigurationProperties(prefix = "spring.mysql.datasource")
+    public DataSource getDatasourceProduct() {
+
+        return DataSourceBuilder.create().build();
     }
 
     @Primary

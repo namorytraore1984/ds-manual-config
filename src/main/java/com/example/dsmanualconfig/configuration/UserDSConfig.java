@@ -1,12 +1,11 @@
 package com.example.dsmanualconfig.configuration;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -24,24 +23,12 @@ import java.util.Map;
 @EnableTransactionManagement
 @Configuration
 public class UserDSConfig {
-    @Value("${spring.h2.datasource.driver-class-name}")
-    private String driverClass;
-    @Value("${spring.h2.datasource.url}")
-    private String url;
-    @Value("${spring.h2.username}")
-    private String username;
-    @Value("${spring.h2.password}")
-    private String password;
 
     @Bean("userDS")
+    @ConfigurationProperties(prefix = "spring.h2.datasource")
     public DataSource getDatasourceUser() {
-
-        return DataSourceBuilder.create()
-                .driverClassName(driverClass)
-                .url(url)
-                .username(username)
-                .password(password)
-                .build();
+        DataSource ds = DataSourceBuilder.create().build();
+        return ds;
     }
 
     @Bean("userEntityManagerFactory")
@@ -57,8 +44,7 @@ public class UserDSConfig {
                 .persistenceUnit("USER")
                 .build();
     }
-
-    @Primary
+    
     @Bean("userTransactionManager")
     public PlatformTransactionManager transactionManager(@Qualifier("userEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
